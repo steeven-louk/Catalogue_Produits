@@ -68,7 +68,7 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
   ]
 
   return (
-    <aside className="w-full lg:w-78 flex-shrink-0 bg-white h-[400px]  p-4 shadow-sm overflow-y-scroll">
+    <aside className="w-full hidden lg:block lg:w-78 flex-shrink-0 bg-white h-[400px]  p-4 shadow-sm overflow-y-scroll">
       {/* Filtres actifs */}
       <h2 className="text-green-700 font-semibold mb-1">Filtres</h2>
       <hr className="mb-3"/>

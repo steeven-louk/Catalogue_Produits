@@ -1,55 +1,68 @@
 import HeaderComponent from "./HeaderComponent";
 import FiltreComponent from "./FiltreComponent";
 import CardComponent from "./CardComponent";
-import { LuSlidersHorizontal } from "react-icons/lu";
-import { useState } from "react";
+// import { LuSlidersHorizontal } from "react-icons/lu";
+import HeaderFilters from "./HeaderFilter";
+import { useMemo } from "react";
 
+
+
+type Product = {
+  id: number
+  name: string
+  image: string
+  price: number
+  labels: string[]
+  isSeasonal: boolean
+}
+
+const IMAGES = [
+  "/assets/produit-1.png",
+  "/assets/produit-2.png",
+  "/assets/produit-3.png",
+  "/assets/produit-4.png",
+  "/assets/produit-5.png",
+]
+
+
+// Génération aléatoire des produits
+const generateProducts = (count: number): Product[] => {
+  const products: Product[] = []
+  for (let i = 0; i < count; i++) {
+    const hasBio = Math.random() < 0.5
+    const hasStg = Math.random() < 0.3
+    const isSeasonal = Math.random() < 0.4
+
+    const labels = []
+    if (hasBio) labels.push("BIO")
+    if (hasStg) labels.push("STG")
+
+    products.push({
+      id: i + 1,
+      name: `Produit ${i + 1}`,
+      image: IMAGES[Math.floor(Math.random() * IMAGES.length)],
+      price: Math.floor(Math.random() * 30) + 3,
+      labels,
+      isSeasonal,
+    })
+  }
+  return products
+}
 const HomeComponent = () => {
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
-
+  const products = useMemo(()=>generateProducts(50), [])
   return (
     <div>
       <HeaderComponent />
       {/* Results Header */}
-      <div className="container mx-auto flex items-center justify-between mb-4 md:mb-6 gap-4 p-2">
-        <div className="flex items-center gap-3">
-          {/* 1. Mobile Filter Button (replacing SheetTrigger/Button) */}
-          <button
-            onClick={() => setMobileFiltersOpen(true)}
-            className="flex items-center px-4 py-2 text-sm border border-gray-300 rounded-md lg:hidden bg-transparent hover:bg-gray-50 transition"
-            aria-label="Ouvrir les filtres"
-          >
-            {/* SlidersHorizontal icon would be rendered here */}
-            <LuSlidersHorizontal className="h-4 w-4 mr-2" />
-            Filtres
-          </button>
-
-          <p className="text-sm">
-            1 665 <span className="text-gray-600">résultats</span>
-          </p>
-        </div>
-
-        <div className="flex items-center">
-          <span className="text-sm hidden sm:inline">Trier par</span>
-
-          {/* 2. Sort Dropdown (replacing Select component) */}
-          <select
-            defaultValue="pertinence"
-            className="w-[120px] sm:w-[140px] text-gray-600 border-gray-300 rounded-md py-2 pl-3 pr-8 text-sm bg-white  focus:ring-blue-500 "
-          >
-            <option value="pertinence">Pertinence</option>
-            <option value="prix-asc">Prix croissant</option>
-            <option value="prix-desc">Prix décroissant</option>
-            <option value="nouveaute">Nouveauté</option>
-          </select>
-          {/* Note: In production, you might add a custom arrow icon next to the select for better styling, as 'appearance-none' removes the default one. */}
-        </div>
-      </div>
+      <HeaderFilters resultsCount={1688}/>
       <div className="flex">
-        <div className="sidebar">
           <FiltreComponent />
-        </div>
-        <CardComponent />
+          <main className="flex-1 px-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {/* <CardComponent /> */}
+        {products.map((product) => (
+          <CardComponent key={product.id} product={product}/>
+      ))}
+          </main>
       </div>
     </div>
   );
