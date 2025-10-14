@@ -8,7 +8,7 @@ const HeaderComponent = () => {
           alt="header image"
           className="w-full h-[200px] object-cover"
         />
-        <div className="absolute container inset-0 bg-gradient-to-r from-black/60 to-black/30" />
+        <div className="absolute w-full inset-0 bg-gradient-to-r from-black/60 to-black/30" />
         <div className="container flex mx-auto gap-[10px] absolute top-5 left-15">
           <div className="bg-white p-0.5 rounded-full">
             <BiChevronLeft className="text-xl"/>
