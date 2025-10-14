@@ -1,49 +1,46 @@
 import React, { useState } from "react";
-import { BiCross, BiMinus, BiPlus } from "react-icons/bi";
-
-
+import { BiMinus, BiPlus } from "react-icons/bi";
+import { RxCross2 } from "react-icons/rx";
 
 type Filter = {
-  id: string
-  label: string
-  count: number
-}
+  id: string;
+  label: string;
+  count: number;
+};
 
 type FiltreComponentProps = {
-  onFilterApply?: () => void
-}
+  onFilterApply?: (data:boolean) => void;
+};
 
-const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
- const [priceRange, setPriceRange] = useState<[number, number]>([0, 60])
+const FiltreComponent: React.FC<FiltreComponentProps> = ({ onFilterApply }) => {
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 60]);
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     labels: true,
-  })
-  const [activeFilters, setActiveFilters] = useState<string[]>(["BIO", "Label Rouge"])
-
+  });
+  const [activeFilters, setActiveFilters] = useState<string[]>([
+    "BIO",
+    "Label Rouge",
+  ]);
+console.log("onFilterApply",onFilterApply)
   const toggleSection = (section: "categories" | "labels") => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
-    }))
-  }
+    }));
+  };
 
-  const handlePriceChange = (index: number, value: string) => {
-    const newRange = [...priceRange] as [number, number]
-    newRange[index] = Number(value)
-    setPriceRange(newRange)
-  }
 
   const toggleFilter = (label: string) => {
     setActiveFilters((prev) =>
       prev.includes(label) ? prev.filter((f) => f !== label) : [...prev, label]
-    )
-  }
+    );
+  };
 
   const clearFilters = () => {
-    setActiveFilters([])
-    setPriceRange([0, 60])
-  }
+    setActiveFilters([]);
+    setPriceRange([0, 60]);
+  };
 
   const categories: Filter[] = [
     { id: "fruits-legumes", label: "Fruits & Légumes", count: 9999 },
@@ -54,7 +51,7 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
     { id: "epicerie-sucree", label: "Épicerie sucrée", count: 425 },
     { id: "produits-laitiers", label: "Produits laitiers", count: 112 },
     { id: "plats-traiteur", label: "Plats traiteur", count: 8361 },
-  ]
+  ];
 
   const labels: Filter[] = [
     { id: "bio", label: "BIO", count: 9999 },
@@ -65,38 +62,41 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
     { id: "label-rouge", label: "Label Rouge", count: 9999 },
     { id: "aoc", label: "Appellation d'origine contrôlée", count: 1 },
     { id: "demeter", label: "Demeter", count: 0 },
-  ]
+  ];
 
   return (
-    <aside className="w-full hidden lg:block lg:w-78 flex-shrink-0 bg-white h-[400px]  p-4 shadow-sm overflow-y-scroll">
+    <aside className="w-full flex-shrink-0 p-4 overflow-y-auto">
       {/* Filtres actifs */}
-      <h2 className="text-green-700 font-semibold mb-1">Filtres</h2>
-      <hr className="mb-3"/>
+      <h2 className="primary font-semibold mb-1 inline-flex items-baseline gap-1">Filtres <span className="block md:hidden plus-jakarta-sans text-[10px] text-[#AAAAAA]">(99)</span></h2>
+      <hr className="mb-3  text-[#AAAAAA]" />
       <div className="flex flex-wrap gap-2 mb-3">
-        <div className="flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-1 rounded-full border border-green-200">
+        <div className="flex items-center gap-1   text-xs px-2 py-1 text-[#AAAAAA] ">
+          <RxCross2
+            className="h-3 w-3 cursor-pointer primary"
+            onClick={() => setPriceRange([0, 60])}
+          />
           <span>
             {priceRange[0]}€ - {priceRange[1]}€
           </span>
-          <BiCross className="h-3 w-3 cursor-pointer" onClick={() => setPriceRange([0, 60])} />
         </div>
 
         {activeFilters.map((filter) => (
           <div
             key={filter}
-            className="flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-1 rounded-full border border-green-200"
+            className="flex items-center gap-1   text-xs px-2 py-1 text-[#AAAAAA] "
           >
-            <span>{filter}</span>
-            <BiCross
-              className="h-3 w-3 cursor-pointer"
+            <RxCross2
+              className="h-3 w-3 cursor-pointer primary"
               onClick={() => toggleFilter(filter)}
             />
+            <span className="plus-jakarta-sans">{filter}</span>
           </div>
         ))}
       </div>
 
       <button
         onClick={clearFilters}
-        className="w-full text-sm bg-green-100 text-green-700 py-2 rounded-full hover:bg-green-200 transition mb-5"
+        className="w-full text-sm bg-[#4EA04C1A] primary py-2 rounded-full hover:bg-green-200 transition mb-5"
       >
         Effacer tous les filtres
       </button>
@@ -105,23 +105,25 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
       <div className="mb-1">
         <button
           onClick={() => toggleSection("categories")}
-          className="flex items-center justify-between w-full mb-1"
+          className="flex items-center justify-between w-full mb-5 pb-1 border-b-1 border-[#AAAAAA]"
         >
-          <h3 className="text-base font-semibold text-gray-700">Catégories</h3>
+          <h3 className="text-base font-semibold primary ">Catégories</h3>
           {expandedSections.categories ? (
-            <BiMinus className="h-4 w-4 text-gray-500" />
+            <BiMinus className="h-4 w-5 text[#E3E3E3]" />
           ) : (
-            <BiPlus className="h-4 w-4 text-gray-500" />
+            <BiPlus className="h-4 w-5 text[#E3E3E3]" />
           )}
         </button>
-        <hr className="mb-5"/>
 
         {expandedSections.categories && (
-          <ul className="space-y-2 text-sm text-gray-700">
+          <ul className="space-y-2 text-sm text-[#AAAAAA] font-normal">
             {categories.map((item) => (
-              <li key={item.id} className="flex justify-between">
+              <li
+                key={item.id}
+                className="flex justify-between hover:text-green-600"
+              >
                 <label className="cursor-pointer">{item.label}</label>
-                <span className="text-gray-400 text-xs">
+                <span className="text-[#AAAAAA]  text-xs">
                   {item.count >= 9999 ? "+9999" : item.count}
                 </span>
               </li>
@@ -134,16 +136,20 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
       <div className="my-4">
         <button
           onClick={() => toggleSection("labels")}
-          className="flex items-center justify-between w-full mb-1"
+          className="flex items-center justify-between w-full mb-5 pb-1 border-b-1 border-[#AAAAAA]"
         >
-          <h3 className="text-base font-semibold text-gray-700">Labels</h3>
+          <div className="flex justify-between w-full">
+            <h3 className="text-base font-semibold primary">Labels</h3>
+            <div className="h-5 w-5 rounded-full bg-[#858585] flex text-white font-semibold text-xs   justify-center">
+              <span className="m-auto">+9</span>
+            </div>
+          </div>
           {expandedSections.labels ? (
-            <BiMinus className="h-4 w-4 text-gray-500" />
+            <BiMinus className="h-4 w-5 text[#E3E3E3]" />
           ) : (
-            <BiPlus className="h-4 w-4 text-gray-500" />
+            <BiPlus className="h-4 w-5 text[#E3E3E3]" />
           )}
         </button>
-        <hr className="mb-5"/>
 
         {expandedSections.labels && (
           <div className="space-y-2 text-sm">
@@ -155,13 +161,20 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
                     id={item.id}
                     checked={activeFilters.includes(item.label)}
                     onChange={() => toggleFilter(item.label)}
-                    className="accent-green-600 cursor-pointer"
+                    className="accent-green-600 cursor-pointer p-1"
                   />
-                  <label htmlFor={item.id} className="cursor-pointer text-gray-700">
+                  <label
+                    htmlFor={item.id}
+                    className={`cursor-pointer plus-jakarta-sans ${
+                      activeFilters.includes(item.label)
+                        ? "primary font-medium"
+                        : "text-[#AAAAAA] hover:text-green-600"
+                    }`}
+                  >
                     {item.label}
                   </label>
                 </div>
-                <span className="text-gray-400 text-xs">
+                <span className="text-[#AAAAAA]  text-xs">
                   {item.count >= 9999 ? "+9999" : item.count}
                 </span>
               </div>
@@ -172,21 +185,22 @@ const FiltreComponent:React.FC<FiltreComponentProps> = ({onFilterApply}) => {
 
       <button
         onClick={clearFilters}
-        className="w-full text-sm bg-green-100 text-green-700 py-2 rounded-full hover:bg-green-200 transition"
+        className="w-full text-sm bg-green-100 primary py-2 rounded-full hover:bg-green-200 transition"
       >
         Effacer le filtre
       </button>
 
       {onFilterApply && (
         <button
-          onClick={onFilterApply}
-          className="w-full mt-6 lg:hidden bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+          onClick={()=>onFilterApply(false)}
+         className="w-full mt-6 text-white py-2 rounded-full hover:bg-green-700 transition"
+          style={{ backgroundColor: '#4EA04C' }} // Use inline style for clarity on primary color
         >
-          Appliquer les filtres
+          Appliqué (9999)
         </button>
       )}
     </aside>
-  )
-}
+  );
+};
 
-export default FiltreComponent
+export default FiltreComponent;

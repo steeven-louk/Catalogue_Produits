@@ -1,4 +1,5 @@
-import { BiChevronLeft, BiHome } from "react-icons/bi";
+import { BiChevronLeft } from "react-icons/bi";
+import { VscHome } from "react-icons/vsc";
 
 const HeaderComponent = () => {
   return (
@@ -11,12 +12,12 @@ const HeaderComponent = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
       
       {/* Breadcrumb */}
-      <div className="absolute top-4 md:top-6 left-4 md:left-6 flex items-center gap-2 md:gap-3">
-        <div className="bg-white p-1 rounded-full">
+      <div className="absolute  px-4 md:px-6 top-4 md:top-6 left-4 md:left-6 flex items-center gap-2 md:gap-3">
+        <div className="bg-white p-0.5 rounded-full">
           <BiChevronLeft className="text-lg md:text-xl" />
         </div>
         <div className="flex items-center gap-1 text-white text-sm md:text-base cursor-pointer">
-          <BiHome />
+          <VscHome  />
           <div className="flex items-center gap-1">
             <span>Accueil</span>
             <span>/</span>
@@ -28,7 +29,7 @@ const HeaderComponent = () => {
       {/* Titre */}
       <div className="absolute inset-0 flex items-center">
         <div className="container mx-auto px-4 md:px-6">
-          <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white">
+          <h1 className="text-[40px] md:text-[60px] font-bold text-white">
             Tous nos produits
           </h1>
         </div>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Poppins,system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Poppins,system-ui,plus-jakarta-sans, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -11,13 +11,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+
+.plus-jakarta-sans {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 body {
@@ -27,7 +25,6 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
   line-height: 1.1;
 }
 
@@ -39,17 +36,14 @@ button {
   transition: border-color 0.25s;
 }
 
-.card{
-  width: 292.8px;
-  min-width: 280px;
-  height: 348px;
-  border-radius: 10px;
-  background: #fff;
-}
+
 button:hover {
   border-color: #646cff;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+.primary{
+  color: #4EA04C;
+}
+.bg-primary{
+  background-color: #4EA04C;
 }
