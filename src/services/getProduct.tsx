@@ -1,20 +1,46 @@
 import { supabase } from "../lib/supabaseClient";
+import type { Product } from "../types/productType";
 
-export async function getProducts() {
-  const { data, error } = await supabase
+
+// 🔹 Fonction pour récupérer les produits paginés
+export async function getProducts({
+  page = 1,
+  limit = 12,
+  labels = [],
+}: {
+  page?: number;
+  limit?: number;
+  labels?: string[];
+}) {
+  let query = supabase
     .from("products")
-    .select(`
+    .select(
+      `
       id,
       name,
       image,
       is_seasonal,
-      categories(name),
-      product_labels(
-        labels(titre, icon)
+      product_labels:product_labels(
+        labels:labels(titre, icon)
       )
-    `)
-    .limit(100);
+      `,
+      { count: "exact" }
+    )
+    .range((page - 1) * limit, page * limit - 1);
+
+  if (labels.length > 0) {
+    query = query.contains("product_labels.labels.titre", labels);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw error;
-  return data;
+
+  return {
+    data: (data as unknown) as Product[] || [],
+    total: count || 0,
+    page,
+    limit,
+    totalPages: Math.ceil((count || 0) / limit),
+  };
 }

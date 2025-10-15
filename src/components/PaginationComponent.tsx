@@ -1,12 +1,6 @@
 import React from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
-
-type PaginationProps = {
-  currentPage: number;
-  totalPages: number;
-  goToPage: (page: number) => void;
-  renderPages: (number | string)[];
-};
+import type { PaginationProps } from "../types/productType";
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,

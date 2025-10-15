@@ -27,8 +27,8 @@ const HeaderComponent = () => {
       </div>
 
       {/* Titre */}
-      <div className="absolute inset-0 flex items-center">
-        <div className="container mx-auto px-4 md:px-6">
+      <div className="absolute inset-0 flex left-4 items-center">
+        <div className="container mr-auto px-4 md:px-6">
           <h1 className="text-[40px] md:text-[60px] font-bold text-white">
             Tous nos produits
           </h1>

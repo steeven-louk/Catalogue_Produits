@@ -37,6 +37,8 @@ Supabase JS Client
 │   └── renderPageNumber.tsx
 ├── lib/
 │   └── supabaseClient.ts
+├── types/
+│   └── productType.ts
 ├── services/
 │   └── getProduct.tsx
 ├── App.tsx

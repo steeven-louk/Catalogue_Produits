@@ -1,20 +1,6 @@
-type Label = {
-  titre: string;
-  icon: string;
-};
+import type { CardComponentProps } from "../types/productType";
 
-type Product = {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  labels: Label[];
-  isSeasonal: boolean;
-};
 
-type CardComponentProps = {
-  product: Product;
-};
 
 const CardComponent = ({ product }: CardComponentProps) => {
   return (
@@ -29,24 +15,24 @@ const CardComponent = ({ product }: CardComponentProps) => {
 
         {/* Labels sur l’image */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">
-          {product.isSeasonal && (
+          {product.is_seasonal && (
             <span className="text-[10px] font-medium bg-white text-green-600 px-2 py-0.5 rounded-full shadow border border-green-200">
               Produit de saison
             </span>
           )}
 
-          {product.labels?.map((label, index) => (
+          {product.product_labels?.map((pl, index:number) => (
             <div
-              key={`${label.titre}-${index}`}
+              key={`${pl.labels.titre}-${index}`}
               className="flex items-center w-fit gap-1 bg-white px-2 py-0.5 rounded-full shadow-sm border border-gray-100"
             >
               <img
-                src={label.icon}
-                alt={label.titre}
+                src={pl.labels.icon}
+                alt={pl.labels.titre}
                 className="w-4 h-4 object-contain"
               />
               <span className="text-[10px] font-medium text-gray-700">
-                {label.titre}
+                {pl.labels.titre}
               </span>
             </div>
           ))}
@@ -55,9 +41,7 @@ const CardComponent = ({ product }: CardComponentProps) => {
 
       {/* Infos du produit */}
       <div className="p-3 flex flex-col gap-1">
-        <p className="text-sm font-medium text-[#505050] truncate">
-          {product.name}
-        </p>
+        <p className="text-sm font-medium text-[#505050] line-clamp-2">{product.name}</p>
       </div>
     </div>
   );

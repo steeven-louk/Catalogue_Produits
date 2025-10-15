@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { BiMinus, BiPlus } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
+import type { Filter, FiltreComponentProps } from "../types/productType";
 
-type Filter = {
-  id: string;
-  label: string;
-  count: number;
-};
 
-type FiltreComponentProps = {
-  onFilterApply?: (data:boolean) => void;
-};
+
 
 const FiltreComponent: React.FC<FiltreComponentProps> = ({ onFilterApply }) => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 60]);
@@ -22,14 +16,13 @@ const FiltreComponent: React.FC<FiltreComponentProps> = ({ onFilterApply }) => {
     "BIO",
     "Label Rouge",
   ]);
-console.log("onFilterApply",onFilterApply)
+
   const toggleSection = (section: "categories" | "labels") => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
-
 
   const toggleFilter = (label: string) => {
     setActiveFilters((prev) =>
@@ -65,9 +58,14 @@ console.log("onFilterApply",onFilterApply)
   ];
 
   return (
-    <aside className="w-full flex-shrink-0 p-4 overflow-y-auto">
+    <aside className="w-full md:w-[95%] flex-shrink-0 p-4 overflow-y-auto">
       {/* Filtres actifs */}
-      <h2 className="primary font-semibold mb-1 inline-flex items-baseline gap-1">Filtres <span className="block md:hidden plus-jakarta-sans text-[10px] text-[#AAAAAA]">(99)</span></h2>
+      <h2 className="primary font-semibold mb-1 inline-flex items-baseline gap-1">
+        Filtres{" "}
+        <span className="block md:hidden plus-jakarta-sans text-[10px] text-[#AAAAAA]">
+          (99)
+        </span>
+      </h2>
       <hr className="mb-3  text-[#AAAAAA]" />
       <div className="flex flex-wrap gap-2 mb-3">
         <div className="flex items-center gap-1   text-xs px-2 py-1 text-[#AAAAAA] ">
@@ -192,9 +190,9 @@ console.log("onFilterApply",onFilterApply)
 
       {onFilterApply && (
         <button
-          onClick={()=>onFilterApply(false)}
-         className="w-full mt-6 text-white py-2 rounded-full hover:bg-green-700 transition"
-          style={{ backgroundColor: '#4EA04C' }} // Use inline style for clarity on primary color
+          onClick={() => onFilterApply(false)}
+          className="w-full mt-6 text-white py-2 rounded-full hover:bg-green-700 transition"
+          style={{ backgroundColor: "#4EA04C" }}
         >
           Appliqué (9999)
         </button>

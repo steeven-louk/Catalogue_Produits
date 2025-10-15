@@ -1,73 +1,36 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import HeaderComponent from "./HeaderComponent";
 import FiltreComponent from "./FiltreComponent";
 import CardComponent from "./CardComponent";
-import HeaderFilters from "./HeaderFilter"; // ← Corrigé : HeaderFilter → HeaderFilters
+import HeaderFilters from "./HeaderFilter";
 import Pagination from "./PaginationComponent";
 
 import { renderPageNumbers } from "../function/renderPageNumber";
+import { getProducts} from "../services/getProduct";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import type { Product } from "../types/productType";
 
-// ✅ Typage du produit
-type Label = {
-  titre: string;
-  icon: string;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  labels: Label[];
-  isSeasonal: boolean;
-};
-
-// ✅ Liste d'images
-const IMAGES: string[] = [
-  "/assets/produit-1.png",
-  "/assets/produit-2.png",
-  "/assets/produit-3.png",
-  "/assets/produit-4.png",
-  "/assets/produit-5.png",
-];
-
-// ✅ Génération de produits aléatoires
-const generateProducts = (count: number): Product[] => {
-  const products: Product[] = [];
-
-  for (let i = 0; i < count; i++) {
-    const hasBio = Math.random() < 0.5;
-    const hasStg = Math.random() < 0.3;
-    const isSeasonal = Math.random() < 0.4;
-
-    const labels: Label[] = [];
-    if (hasBio) labels.push({ titre: "BIO", icon: "/assets/bio.png" });
-    if (hasStg) labels.push({ titre: "STG", icon: "/assets/stg.png" });
-
-    products.push({
-      id: i + 1,
-      name: `Produit ${i + 1}`,
-      image: IMAGES[Math.floor(Math.random() * IMAGES.length)],
-      price: Math.floor(Math.random() * 30) + 3,
-      labels,
-      isSeasonal,
-    });
-  }
-
-  return products;
-};
-
-// ✅ Composant principal
 const HomeComponent = () => {
-  const products = useMemo(() => generateProducts(110), []);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 10;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProduct, setTotalProduct] = useState(0);
+  const itemsPerPage = 30;
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
   const renderPages = renderPageNumbers(currentPage, totalPages);
+
+  useEffect(() => {
+    setLoading(true);
+    getProducts({ page: currentPage, limit: itemsPerPage })
+      .then((res) => {
+        setProducts(res.data);
+        setTotalProduct(res.total)
+        setTotalPages(res.totalPages);
+      })
+      .finally(() => setLoading(false));
+  }, [currentPage]);
 
   const goToPage = (page: number): void => {
     if (page >= 1 && page <= totalPages) {
@@ -79,18 +42,23 @@ const HomeComponent = () => {
   return (
     <div>
       <HeaderComponent />
-      <HeaderFilters resultsCount={1688} />
+      <HeaderFilters resultsCount={totalProduct} />
 
       <div className="flex flex-col lg:flex-row">
         <aside className="hidden lg:block lg:w-78">
-        <FiltreComponent />
-
+          <FiltreComponent />
         </aside>
 
-        <main className="flex-1 px-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mb-4 gap-4">
-          {currentProducts.map((product) => (
-            <CardComponent key={product.id} product={product} />
-          ))}
+        <main className="flex-1 px-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mb-4 gap-3">
+          {loading ? (
+            <div className="w-fit mx-auto items-center justify-center absolute flex">
+              <AiOutlineLoading3Quarters className="w-10 h-10 animate-spin" />
+            </div>
+          ) : (
+            products.map((product) => (
+              <CardComponent key={product.id} product={product} />
+            ))
+          )}
         </main>
       </div>
 

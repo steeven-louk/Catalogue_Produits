@@ -3,10 +3,8 @@ import { BiChevronDown } from "react-icons/bi";
 import { LuSlidersHorizontal } from "react-icons/lu";
 import FiltreComponent from "./FiltreComponent";
 import { RxCross2 } from "react-icons/rx";
+import type { HeaderFiltersProps } from "../types/productType";
 
-type HeaderFiltersProps = {
-  resultsCount: number;
-};
 
 const HeaderFilters: React.FC<HeaderFiltersProps> = ({ resultsCount }) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
@@ -16,7 +14,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ resultsCount }) => {
     <div className="w-full lg:container lg:mx-auto p-1">
       <div className="w-full flex items-center justify-between mb-4 md:mb-6 px-3 gap-4">
         <p className="text-sm text-[#505050] hidden md:inline font-medium">
-          {resultsCount.toLocaleString()}{" "}
+          {resultsCount.toLocaleString() || "1465"}{" "}
           <span className="text-[#858585] font-normal">résultats</span>
         </p>
 
