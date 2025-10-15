@@ -31,63 +31,71 @@ Supabase JS Client
 ## 📁 Structure du projet
 
 📦 project-root/
-├── backend/
-│   ├── schema.sql          # Création des tables
-│   ├── seed.sql            # Données d’exemple
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # Composants React
-│   │   ├── services/
-│   │   │   ├── supabaseClient.ts
-│   │   │   └── products.ts
-│   │   └── pages/
-│   ├── vite.config.ts
-│   └── package.json
-└── README.md
+├── assets/
+├── components/
+├── function/
+│   └── renderPageNumber.tsx
+├── lib/
+│   └── supabaseClient.ts
+├── services/
+│   └── getProduct.tsx
+├── App.tsx
+├── index.css
+├── main.tsx
+├── .env
+├── .gitignore
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── README.md
+└── tsconfig.app.json
+
 
 ## 🗄️ 1. Base de données Supabase
 
-### 📘 `backend/schema.sql`
 
 \-- ==========================
 --  STRUCTURE DE LA BASE
 -- ==========================
 ````
-DROP TABLE IF EXISTS product\_labels;
+DROP TABLE IF EXISTS product_labels;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS labels;
 DROP TABLE IF EXISTS categories;
 
-CREATE TABLE categories (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL
+-- Table: categories
+create table if not exists categories (
+  id serial primary key,
+  name text not null
 );
 
-CREATE TABLE labels (
-  id SERIAL PRIMARY KEY,
-  titre TEXT NOT NULL,
-  icon TEXT
+-- Table: labels
+create table if not exists labels (
+  id serial primary key,
+  titre text not null,
+  icon text not null
 );
 
-CREATE TABLE products (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  image TEXT NOT NULL,
-  price NUMERIC DEFAULT 0,
-  is\_seasonal BOOLEAN DEFAULT FALSE,
-  category\_id INTEGER REFERENCES categories(id) ON DELETE CASCADE
+-- Table: products
+create table if not exists products (
+  id serial primary key,
+  name text not null,
+  image text not null,
+  is_seasonal boolean default false,
+  category_id int references categories(id)
 );
 
-CREATE TABLE product\_labels (
-  product\_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
-  label\_id INTEGER REFERENCES labels(id) ON DELETE CASCADE,
-  PRIMARY KEY (product\_id, label\_id)
+-- Table de relation produit ↔ labels
+create table if not exists product_labels (
+  product_id int references products(id) on delete cascade,
+  label_id int references labels(id) on delete cascade,
+  primary key (product_id, label_id)
 );
 ````
 
-### 🌱 `backend/seed.sql`
 
-\-- ==========================
+-- ==========================
 --  DONNÉES DE DÉMO
 -- ==========================
 
@@ -106,49 +114,65 @@ INSERT INTO categories (name) VALUES
 INSERT INTO labels (titre, icon) VALUES
   ('BIO', '/assets/bio.png'),
   ('STG', '/assets/stg.png');
+
+  RETURNING id; -- Récupère les IDs pour référence si besoin
 ````
 
 -- 🛒 Insertion de 5 produits de base
 ````
-INSERT INTO products (name, image, price, is_seasonal, category_id) VALUES
-  ('Bourriche d''huîtres l''Authentique de Paimpol - 50 n°3', '/assets/produit-5.png', 29.99, true, 1),
-  ('Confit de vin rouge Bio', '/assets/produit-1.png', 12.50, false, 2),
-  ('Sorbet Pomme Verte 0.5L', '/assets/produit-2.png', 7.80, false, 3),
-  ('Yaourt Nature Bio 4x125g', '/assets/produit-3.png', 4.20, true, 4),
-  ('Charcuterie artisanale', '/assets/produit-4.png', 8.90, true, 5);
+INSERT INTO products (name, image, is_seasonal, category_id) VALUES
+ ('Bourriche d''huîtres l''Authentique de Paimpol - 50 n°3', '/assets/produit-5.png', false, 1),
+ ('Confit de vin rouge Bio', '/assets/produit-1.png', false, 2),
+ ('Sorbet Pomme Verte 0.5L', '/assets/produit-2.png', false, 3),
+ ('Confit de vin rouge Bio', '/assets/produit-3.png', true, 4),
+ ('Confit de vin rouge Bio', '/assets/produit-4.png', true, 5)
+
+RETURNING id; -- Récupère les IDs (ici: 1 à 5)
 ````
 
 -- 🔗 Association des produits aux labels
 ````
+-- On suppose que label_id 1 = BIO et 2 = STG
+
 INSERT INTO product_labels (product_id, label_id) VALUES
-  (1, 1), (1, 2), -- Produit 1: BIO, STG
-  (2, 1), (2, 2), -- Produit 2: BIO, STG
-  (3, 2),         -- Produit 3: STG
-  (4, 1),         -- Produit 4: BIO
-  (5, 2);         -- Produit 5: STG
+ (2, 1), (2, 2), -- Produit 2: BIO, STG
+ (5, 1); -- Produit 5: BIO
 ````
 
 -- 📦 Duplication des produits pour le volume
 ````
-INSERT INTO products (name, image, price, is\_seasonal, category\_id)
-SELECT name, image, price, is\_seasonal, category\_id FROM products LIMIT 5;
-
-
-INSERT INTO products (name, image, price, is\_seasonal, category\_id)
-SELECT name, image, price, is\_seasonal, category\_id FROM products LIMIT 5;
+-- Définir combien de fois dupliquer les 5 produits de base.
+-- Dupliquer 20 fois les 5 produits de base créera 100 produits (20 * 5)
+-- et donc un total de 105 produits dans la table.
+WITH initial_products AS (
+ SELECT id, name, image, is_seasonal, category_id FROM products LIMIT 5
+),
+duplicates AS (
+ -- Insertion des N duplicatas des produits
+ INSERT INTO products (name, image, is_seasonal, category_id)
+ SELECT
+  p.name,
+  p.image,
+  p.is_seasonal,
+  p.category_id
+ FROM initial_products p, generate_series(1, 150) AS s(i) -- Duplique chaque produit 150 fois
+ RETURNING id AS new_product_id, (id - 5) % 5 + 1 AS original_product_id
+)
 ````
 
--- 🔁 Réassociation des labels (ATTENTION: Ceci assigne TOUS les labels à TOUS les produits dupliqués)
+-- 🔗 Association des labels pour les produits dupliqués
 ````
-INSERT INTO product\_labels (product\_id, label\_id)
-SELECT p.id, l.id
-FROM products p
-JOIN labels l ON true
-WHERE p.id > 5;
+INSERT INTO product_labels (product_id, label_id)
+SELECT
+ d.new_product_id,   -- Le nouvel ID du produit dupliqué
+ pl.label_id     -- L'ID du label associé au produit original
+FROM duplicates d
+JOIN product_labels pl
+ ON pl.product_id = d.original_product_id;
 ````
 ## ⚙️ 2. Connexion Supabase côté Frontend
 
-### 📄 `frontend/src/services/supabaseClient.ts`
+### 📄 `Catalogue_Produits/src/services/supabaseClient.ts`
 
 ````
 import { createClient } from "@supabase/supabase-js";
@@ -161,7 +185,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 > **Configuration de l'environnement**
 
-> Créez le fichier `.env` à la racine du dossier `frontend` :
+> Créez le fichier `.env` à la racine du dossier `Catalogue_Produits` :
 
 ````bash
 VITE_SUPABASE_URL=[https://xxxx.supabase.co](https://xxxx.supabase.co)
@@ -172,50 +196,60 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 
 Ce service utilise le concept de `join` dans Supabase via la syntaxe `select()` pour récupérer les relations (catégories et labels).
 
-### 📄 `frontend/src/services/products.ts`
+### 📄 `Catalogue_Produits/src/services/products.ts`
 
 ```bash
 import { supabase } from "./supabaseClient";
 
-export const getProducts = async () => {
-  const { data, error } = await supabase
+export async function getProducts({
+  page = 1,
+  limit = 12,
+  labels = [],
+}: {
+  page?: number;
+  limit?: number;
+  labels?: string[];
+}) {
+  let query = supabase
     .from("products")
-    .select(`
+    .select(
+      `
       id,
       name,
       image,
-      price,
       is_seasonal,
-      category:categories(name),
-      product_labels (
-        label:labels(titre, icon)
+      product_labels:product_labels(
+        labels:labels(titre, icon)
       )
-    `);
+      `,
+      { count: "exact" }
+    )
+    .range((page - 1) * limit, page * limit - 1);
 
-  if (error) {
-    console.error("Erreur lors du chargement des produits :", error.message);
-    throw error;
+  if (labels.length > 0) {
+    query = query.contains("product_labels.labels.titre", labels);
   }
 
-  -- Mappe les données pour simplifier la structure côté React
-  return data.map((p) => ({
-    id: p.id,
-    name: p.name,
-    image: p.image,
-    price: p.price,
-    isSeasonal: p.is_seasonal,
-    category: p.category?.name,
-    labels: p.product_labels?.map((pl) => pl.label) || [],
-  }));
-};
+  const { data, error, count } = await query;
+
+  if (error) throw error;
+
+  return {
+    data: (data as unknown) as Product[] || [],
+    total: count || 0,
+    page,
+    limit,
+    totalPages: Math.ceil((count || 0) / limit),
+  };
+}
 ```
 
 
-## 🧾 5. Lancement du projet
+## 🧾 4. Lancement du projet
 
 ### 📦 Installation des dépendances
 ```bash
-cd frontend
+cd Catalogue_Produits
 npm install
 ```
 
@@ -227,18 +261,6 @@ npm run dev
 Accédez à l’application sur :
 
 👉 `http://localhost:5173`
-
-## 🧠 6. Déploiement
-
-### 🌐 Sur Vercel ou Netlify
-
-1.  Déployez votre projet React (build avec `npm run build`).
-2.  Configurez les variables d’environnement :
-
--   `VITE_SUPABASE_URL`
--   `VITE_SUPABASE_ANON_KEY`
-
-Votre application sera connectée automatiquement à Supabase.
 
 
 
